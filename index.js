@@ -10,8 +10,6 @@ app.use(volleyball);
 app.use(cors());
 app.use(express.json());
 
-app.use("/", express.static("public"));
-
 app.get("/count", (req, res) => {
   const file = "count.txt";
   let count = fs.readFileSync(file, { encoding: "utf-8" });
