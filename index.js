@@ -12,6 +12,15 @@ app.use(express.json());
 
 app.use("/", express.static("public"));
 
+app.get("/count", (req, res) => {
+  const file = "count.txt";
+  let count = fs.readFileSync(file, { encoding: "utf-8" });
+  count = parseInt(count);
+  res.json({
+    count: count,
+  });
+});
+
 app.get("/counter.png", (req, res) => {
   getImg();
   res.sendFile(__dirname + "/counter.png");
@@ -48,13 +57,13 @@ async function getImg() {
     height: 72,
     deviceScaleFactor: 1,
   });
-  await page.goto("http://localhost/:5000");
+  await page.goto("https://hitcounter-client.netlify.app/");
   await page.screenshot({ path: "counter.png" });
   await browser.close();
 }
 
 function count() {
-  const file = "./public/count.txt";
+  const file = "count.txt";
   let count = fs.readFileSync(file, { encoding: "utf-8" });
   count = parseInt(count);
   count += 1;
