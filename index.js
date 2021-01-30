@@ -37,8 +37,22 @@ app.get("/count", (req, res) => {
 });
 
 app.get("/counter.png", (req, res) => {
-  getImg();
-  res.sendFile(__dirname + "/counter.png");
+  async function counterreq() {
+    console.log("running the count route");
+    countdb();
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setViewport({
+      width: 495,
+      height: 72,
+      deviceScaleFactor: 1,
+    });
+    await page.goto("https://hitcounter-client.netlify.app/");
+    await page.screenshot({ path: "counter.png" });
+    await browser.close();
+    res.sendFile(__dirname + "/counter.png");
+  }
+  counterreq();
 });
 
 function notFound(req, res, next) {
