@@ -64,13 +64,8 @@ app.listen(port, () => {
 });
 
 async function getImg() {
-<<<<<<< HEAD
   countdb();
   const browser = await puppeteer.launch();
-=======
-  count();
-  const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
->>>>>>> 988f9e6b988e479eaa70e47211e1219d85b1e69c
   const page = await browser.newPage();
   await page.setViewport({
     width: 495,
