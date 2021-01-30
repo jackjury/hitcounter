@@ -6,16 +6,33 @@ const fs = require("fs");
 
 const app = express();
 
+const MongoClient = require("mongodb").MongoClient;
+const uri =
+  "mongodb+srv://counter:FswSGIDm4Gwq5DY6@cluster0.qwd9s.mongodb.net/count?retryWrites=true&w=majority";
+const client = new MongoClient(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const counter = "jackjurycv";
+let newcount;
+let filter = {
+  _id: null,
+};
+let replacementDocument = {
+  _id: null,
+  counter: counter,
+  count: null,
+};
+
 app.use(volleyball);
 app.use(cors());
 app.use(express.json());
 
 app.get("/count", (req, res) => {
   const file = "count.txt";
-  let count = fs.readFileSync(file, { encoding: "utf-8" });
-  count = parseInt(count);
   res.json({
-    count: count,
+    count: newcount,
   });
 });
 
@@ -47,7 +64,7 @@ app.listen(port, () => {
 });
 
 async function getImg() {
-  count();
+  countdb();
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   await page.setViewport({
@@ -67,4 +84,29 @@ function count() {
   count += 1;
   let output = count.toString();
   fs.writeFileSync(file, output);
+}
+
+async function countdb() {
+  try {
+    // Connect the client to the server
+    await client.connect();
+    // Establish and verify connection
+    const database = client.db("DB");
+    const collection = database.collection("count");
+    const find = await collection.find({
+      counter: counter,
+    });
+    await find.forEach((element) => {
+      filter._id = element._id;
+      newcount = element.count + 1;
+    });
+
+    console.log(newcount);
+    replacementDocument._id = filter._id;
+    replacementDocument.count = newcount;
+    await collection.replaceOne(filter, replacementDocument);
+  } finally {
+    // Ensures that the client will close when you finish/error
+    // await client.close();
+  }
 }
